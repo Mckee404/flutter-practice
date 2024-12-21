@@ -3,6 +3,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/class_todo.dart';
 import 'todo_add_page.dart';
 import 'todo_item.dart';
 
@@ -31,7 +32,7 @@ class ToDoListPage extends StatefulWidget {
 }
 
 class _ToDoListPageState extends State<ToDoListPage> {
-  List<String> toDoList = [];
+  List<Todo> toDoList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +54,14 @@ class _ToDoListPageState extends State<ToDoListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final newListText = await Navigator.of(context).push(
+          final newTodo = await Navigator.of(context).push(
             MaterialPageRoute(builder: (context) {
               return ToDoAddPage();
             }),
           );
-          if (newListText != null) {
+          if (newTodo != null) {
             setState(() {
-              toDoList.add(newListText);
+              toDoList.add(newTodo);
             });
           }
         },
