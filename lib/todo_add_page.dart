@@ -1,10 +1,12 @@
-//aaa
+//aaaaaa
 
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/class_todo.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ToDoAddPage extends StatefulWidget {
+  Todo? modifyingItem;
+  ToDoAddPage({super.key, this.modifyingItem});
   @override
   _ToDoAddPageState createState() => _ToDoAddPageState();
 }
@@ -12,42 +14,34 @@ class ToDoAddPage extends StatefulWidget {
 class _ToDoAddPageState extends State<ToDoAddPage> {
   final _formKey = GlobalKey<FormState>();
 
-
-  // var todo=Todo(_titleText,_description);
   var todo = Todo();
 
   void changeColor(Color changedColor) => setState(() => todo.color = changedColor);
 
   @override
+  void initState(){
+    todo=widget.modifyingItem??todo;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('リスト追加'),
+        title: Text(widget.modifyingItem==null?"リスト追加":"リスト編集"),
       ),
       body: Form(
         key: _formKey,
         child: Container(
-          padding: EdgeInsets.all(64),
+          padding: const EdgeInsets.all(64),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // TextField(
-              //   decoration: const InputDecoration(
-              //     hintText: "タイトルを入力してください",
-              //   ),
-              //   onChanged: (String value) {
-              //     setState(() {
-              //       _titleText = value;
-              //     });
-              //   },
-              // ),
               TextFormField(
                 decoration: const InputDecoration(
                   hintText: "タイトルを入力してください",
                 ),
-                onFieldSubmitted: (value) {
-                  // do something
-                },
+                initialValue: todo.title,
                 onChanged: (String value) {
                   setState(() {
                     todo.title = value;
@@ -65,7 +59,8 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
               const SizedBox(
                 height: 8,
               ),
-              TextField(
+              TextFormField(
+                initialValue: todo.description,
                 maxLines: null,
                 decoration: const InputDecoration(
                   hintText: "説明を入力してください",
@@ -79,13 +74,14 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
               const SizedBox(
                 height: 40,
               ),
-              Text(
+              const Text(
                 "ラベルの色を選択",
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     width: 100,
@@ -95,7 +91,7 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                       color: todo.color,
                     ),
                   ),
-                  SizedBox(width: 15,),
+                  const SizedBox(width: 16,),
                   SlidePicker(
                     pickerColor: todo.color,
                     onColorChanged: changeColor,
@@ -104,16 +100,15 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                     displayThumbColor: false,
                   ),
                 ],
-                mainAxisAlignment: MainAxisAlignment.center,
               ),
               const SizedBox(
-                height: 60,
+                height: 56,
               ),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.edit),
+                      icon: const Icon(Icons.done),
                       label: const Text('保存する'),
                       onPressed: () {
                         // ボタンタップ時の処理
@@ -123,8 +118,8 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    width: 10,
+                  const SizedBox(
+                    width: 8,
                   ),
                   Expanded(
                     child: OutlinedButton.icon(
