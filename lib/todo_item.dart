@@ -3,32 +3,36 @@ import 'class_todo.dart';
 import 'todo_add_page.dart';
 
 class TodoItem extends StatefulWidget {
-  Todo item;
+  final Todo item;
   final VoidCallback onDelete;
-  TodoItem({super.key, required this.item, required this.onDelete});
+  const TodoItem({
+    super.key,
+    required this.item,
+    required this.onDelete,
+  });
 
   @override
   State<TodoItem> createState() => _TodoItemState();
 }
 
 class _TodoItemState extends State<TodoItem> {
-  late Todo item;
+  late Todo currentState;
   late VoidCallback onDelete;
   @override
   void initState() {
     super.initState();
 
-    item = widget.item;
+    currentState = widget.item;
     onDelete = widget.onDelete;
   }
 
   @override
   Widget build(BuildContext context) {
     final Text? listTileSubTitle;
-    if (item.description.isEmpty) {
+    if (currentState.description.isEmpty) {
       listTileSubTitle = null;
     } else {
-      listTileSubTitle = Text(item.description);
+      listTileSubTitle = Text(currentState.description);
     }
     return Card(
       shape: RoundedRectangleBorder(
@@ -36,20 +40,23 @@ class _TodoItemState extends State<TodoItem> {
       ),
       child: ClipPath(
         clipper: ShapeBorderClipper(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10))),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-                left: BorderSide(
-              color: item.color,
-              width: 24,
-            )),
+              left: BorderSide(
+                color: currentState.color,
+                width: 24,
+              ),
+            ),
           ),
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           alignment: Alignment.centerLeft,
           child: ListTile(
-            title: Text(item.title),
+            title: Text(currentState.title),
             subtitle: listTileSubTitle,
             trailing: Wrap(
               spacing: 8,
@@ -58,19 +65,25 @@ class _TodoItemState extends State<TodoItem> {
                   icon: const Icon(Icons.edit),
                   onPressed: () async {
                     final returnValue = await Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) {
-                        return ToDoAddPage(modifyingItem: item,);
-                      }),
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return ToDoAddPage(
+                            modifyingItem: currentState,
+                          );
+                        },
+                      ),
                     );
-                    if(returnValue is Todo){
-                      setState(() {
-                        item=returnValue;
-                      });
+                    if (returnValue is Todo) {
+                      setState(
+                        () {
+                          currentState = returnValue;
+                        },
+                      );
                     }
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: onDelete,
                 ),
               ],

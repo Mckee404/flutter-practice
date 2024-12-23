@@ -1,34 +1,55 @@
-//aaaaaa
-
 import 'package:flutter/material.dart';
 import 'package:flutter_practice/class_todo.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ToDoAddPage extends StatefulWidget {
-  Todo? modifyingItem;
-  ToDoAddPage({super.key, this.modifyingItem});
+  final Todo? modifyingItem;
+  const ToDoAddPage({
+    super.key,
+    this.modifyingItem,//編集したいTodoアイテム
+  });
   @override
-  _ToDoAddPageState createState() => _ToDoAddPageState();
+  State createState() => _ToDoAddPageState();
 }
 
 class _ToDoAddPageState extends State<ToDoAddPage> {
   final _formKey = GlobalKey<FormState>();
 
-  var todo = Todo();
+  late Todo editingTodo;//編集したいTodoアイテムを直接変更しないようにコピーしておくTodoアイテム
 
-  void changeColor(Color changedColor) => setState(() => todo.color = changedColor);
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+
+  late Color colorSample;//編集したいTodoアイテムの色を初期値とし、色見本として変化していくColor
+  void changeColor(Color changedColor) =>
+      setState(() => colorSample = changedColor);
 
   @override
-  void initState(){
-    todo=widget.modifyingItem??todo;
+  void initState() {
+    editingTodo = Todo(
+      title: widget.modifyingItem?.title ?? "",
+      description: widget.modifyingItem?.description ?? "",
+      color: widget.modifyingItem?.color ?? Colors.amber,
+    );
+    _titleController = TextEditingController(text: editingTodo.title);
+    _descriptionController =
+        TextEditingController(text: editingTodo.description);
+    colorSample = editingTodo.color;
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.modifyingItem==null?"リスト追加":"リスト編集"),
+        title: Text(widget.modifyingItem == null ? "リスト追加" : "リスト編集"),
       ),
       body: Form(
         key: _formKey,
@@ -37,21 +58,15 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextFormField(
+              TextFormField( // TextEditingControllerとinitialValueの併用は不可
                 decoration: const InputDecoration(
                   hintText: "タイトルを入力してください",
                 ),
-                initialValue: todo.title,
-                onChanged: (String value) {
-                  setState(() {
-                    todo.title = value;
-                  });
-                },
+                controller: _titleController,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
-                  // 入力値を受け取る
                   if (value == null || value.isEmpty) {
-                    return '値を入力してください'; // エラーメッセージとして表示される
+                    return '値を入力してください';
                   }
                   return null;
                 },
@@ -60,16 +75,11 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                 height: 8,
               ),
               TextFormField(
-                initialValue: todo.description,
                 maxLines: null,
                 decoration: const InputDecoration(
                   hintText: "説明を入力してください",
                 ),
-                onChanged: (String value) {
-                  setState(() {
-                    todo.description = value;
-                  });
-                },
+                controller: _descriptionController,
               ),
               const SizedBox(
                 height: 40,
@@ -84,16 +94,18 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 104,
+                    height: 104,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: todo.color,
+                      color: colorSample,
                     ),
                   ),
-                  const SizedBox(width: 16,),
+                  const SizedBox(
+                    width: 16,
+                  ),
                   SlidePicker(
-                    pickerColor: todo.color,
+                    pickerColor: colorSample,
                     onColorChanged: changeColor,
                     enableAlpha: false,
                     showIndicator: false,
@@ -111,9 +123,13 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
                       icon: const Icon(Icons.done),
                       label: const Text('保存する'),
                       onPressed: () {
-                        // ボタンタップ時の処理
                         if (_formKey.currentState!.validate()) {
-                          Navigator.of(context).pop(todo);
+                          editingTodo = Todo(
+                            title: _titleController.text,
+                            description: _descriptionController.text,
+                            color: colorSample,
+                          );
+                          Navigator.of(context).pop(editingTodo);
                         }
                       },
                     ),
