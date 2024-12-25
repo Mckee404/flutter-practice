@@ -68,7 +68,7 @@ class _TodoItemState extends State<TodoItem> {
                       MaterialPageRoute(
                         builder: (context) {
                           return ToDoAddPage(
-                            modifyingItem: currentState,
+                            modifiedItem: currentState,
                           );
                         },
                       ),
