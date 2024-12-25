@@ -3,10 +3,10 @@ import 'package:flutter_practice/class_todo.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ToDoAddPage extends StatefulWidget {
-  final Todo? modifyingItem;
+  final Todo? modifiedItem;
   const ToDoAddPage({
     super.key,
-    this.modifyingItem,//編集したいTodoアイテム
+    this.modifiedItem, //編集したいTodoアイテム
   });
   @override
   State createState() => _ToDoAddPageState();
@@ -15,22 +15,23 @@ class ToDoAddPage extends StatefulWidget {
 class _ToDoAddPageState extends State<ToDoAddPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late Todo editingTodo;//編集したいTodoアイテムを直接変更しないようにコピーしておくTodoアイテム
+  late Todo editingTodo; //編集したいTodoアイテムを直接変更しないようにコピーしておくTodoアイテム
 
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
 
-  late Color colorSample;//編集したいTodoアイテムの色を初期値とし、色見本として変化していくColor
+  late Color colorSample; //編集したいTodoアイテムの色を初期値とし、色見本として変化していくColor
   void changeColor(Color changedColor) =>
       setState(() => colorSample = changedColor);
 
   @override
   void initState() {
-    editingTodo = Todo(
-      title: widget.modifyingItem?.title ?? "",
-      description: widget.modifyingItem?.description ?? "",
-      color: widget.modifyingItem?.color ?? Colors.amber,
-    );
+    editingTodo = widget.modifiedItem?.copy() ??
+        const Todo(
+          title: "",
+          description: "",
+          color: Colors.amber,
+        );
     _titleController = TextEditingController(text: editingTodo.title);
     _descriptionController =
         TextEditingController(text: editingTodo.description);
@@ -49,7 +50,7 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.modifyingItem == null ? "リスト追加" : "リスト編集"),
+        title: Text(widget.modifiedItem == null ? "リスト追加" : "リスト編集"),
       ),
       body: Form(
         key: _formKey,
@@ -58,7 +59,8 @@ class _ToDoAddPageState extends State<ToDoAddPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              TextFormField( // TextEditingControllerとinitialValueの併用は不可
+              TextFormField(
+                // TextEditingControllerとinitialValueの併用は不可
                 decoration: const InputDecoration(
                   hintText: "タイトルを入力してください",
                 ),
